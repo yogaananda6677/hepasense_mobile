@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "72883906387",
+    "project_id": "hepasense-72d3c",
+    "storage_bucket": "hepasense-72d3c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:72883906387:android:378cdc02b21bdb2f0aa3a6",
+        "android_client_info": {
+          "package_name": "com.yogaananda.hepasense"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRP1sLMFOORgDKZYNsZchTwJ4TDTjLxTQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
