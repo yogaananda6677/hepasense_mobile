@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../domain/auth_status.dart';
 import '../controllers/auth_controller.dart';
@@ -90,38 +91,46 @@ class _MfaPageState extends ConsumerState<MfaPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                AppTextField(
-                  label: 'Kode OTP',
-                  hint: 'Masukkan 6 digit kode',
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.done,
-                  controller: _otpController,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return 'Kode wajib diisi';
-                    }
-                    if (v.trim().length != 6) {
-                      return 'Kode harus 6 digit';
-                    }
-                    return null;
-                  },
-                  onFieldSubmitted: (_) async => _submit(),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                AppButton(
-                  onPressed: _isSubmitting ? null : _submit,
-                  text: 'Verifikasi',
-                  isLoading: _isSubmitting,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextButton(
-                  onPressed: () {
-                    ref
-                        .read(authControllerProvider.notifier)
-                        .resetToUnauthenticated();
-                    context.go(AppRoutes.login);
-                  },
-                  child: const Text('Kembali ke Login'),
+                AppCard(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppTextField(
+                        label: 'Kode OTP',
+                        hint: 'Masukkan 6 digit kode',
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        controller: _otpController,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return 'Kode wajib diisi';
+                          }
+                          if (v.trim().length != 6) {
+                            return 'Kode harus 6 digit';
+                          }
+                          return null;
+                        },
+                        onFieldSubmitted: (_) async => _submit(),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      AppButton(
+                        onPressed: _isSubmitting ? null : _submit,
+                        text: 'Verifikasi',
+                        isLoading: _isSubmitting,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextButton(
+                        onPressed: () {
+                          ref
+                              .read(authControllerProvider.notifier)
+                              .resetToUnauthenticated();
+                          context.go(AppRoutes.login);
+                        },
+                        child: const Text('Kembali ke Login'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

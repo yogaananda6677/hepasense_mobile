@@ -30,7 +30,7 @@ Backend root: `/home/yoga/Data/TFS/hepasense_backend/` — mobile must not modif
 | POST | `/api/v1/auth/2fa/login/` | none | challenge, otp_code | final JWTs (mfa_verified=true) | 5-min one-time challenge, TOTPDevice |
 | POST | `/api/v1/auth/logout/` | JWT | refresh token | 204/blacklist | revokes supplied refresh token only (Backend Phase 1 §74) |
 | GET/PUT/PATCH | `/api/v1/accounts/profile/` | JWT | current-user fields (email/roles/2FA immutable) | profile | PRD §40 |
-| POST | `/api/v1/accounts/change-password/` | JWT | old_password, new_password, confirm | 200/204 | invalidates existing JWT sessions server-side (PRD §41, §1186) |
+| POST | `/api/v1/accounts/change-password/` | JWT | old_password, new_password, new_password_confirm | 200 | invalidates all existing JWT sessions; client clears local tokens and returns to login (PRD §41, §1186) |
 
 **MFA rules:** Never bypass MFA. Never use another token endpoint to skip 2FA. The app must treat `challenge` as sensitive temporary material and not log it (PRD §1153, §54).
 
@@ -148,3 +148,18 @@ The FCM registration token is neither read nor sent to Django.
 - Education / Nutrition / FAQ API: **READY — backend contract available** (Backend Phase 8, `docs/backend/14-phase-8-education-content.md`, COMPLETED 2026-08-12). Public read-only API.
 - Report-by-email backend: not defined → PRD §49 deferred.
 - AI / Tanya AI: not implemented → PRD §1278 DEFERRED, out of scope.
+
+## 10. Phase 9 Education integration (implemented)
+
+- `GET /api/v1/education/articles/` with only `type`, `category`, `featured`, `search`, and `page`.
+- `GET /api/v1/education/articles/{slug}/` for published detail.
+- `GET /api/v1/education/categories/` for active categories and public article counts.
+- Final frozen list fields are `id`, `type`, `title`, `slug`, `summary`, nullable `thumbnail`, `is_featured`, `read_time_minutes`, `published_at`, and nullable `category`; detail adds `content` and `updated_at`.
+- The API is public/read-only, while the current MVP route remains in the authenticated app shell. Nutrition is general education and sends no Patient, Screening, NH3, classification, confidence, or risk parameters.
+- Content is rendered by the dependency-free `SafeArticleBody` as non-executable Markdown-style/plain text. HTML tags are never instantiated as widgets, WebViews, links, scripts, or remote content.
+# Phase 13 linkage clarification
+
+Registration does not create a Patient. `GET /api/v1/patients/me/` remains 404
+until a healthcare operator completes exact-email onboarding. The mobile client
+keeps the authenticated session and retries this GET explicitly or once on app
+resume; it never self-claims a Patient.

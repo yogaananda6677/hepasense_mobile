@@ -20,7 +20,7 @@ Splash
                                           ├─ Privacy Policy
                                           ├─ Help
                                           └─ Logout
-Home also offers Education / Help shortcuts → Education backend contract available (Phase 9)
+Home offers an Education & Saran Gizi shortcut → public Education API (Phase 9)
 ```
 
 ## Screen inventory
@@ -36,16 +36,17 @@ Home also offers Education / Help shortcuts → Education backend contract avail
 | Screening History | 5 | yes | `/api/v1/screenings/` | paginated, status filters, refresh/load-more, compact safe rows |
 | Screening Detail | 6 | yes | `/api/v1/screenings/{id}/` | patient-safe fields only |
 | Notification Center | 7 | yes | `/api/v1/notifications/`, `/api/v1/notifications/{id}/read/`, `/api/v1/notifications/read-all/` | list, mark read, mark all read, badge |
-| Education (articles) | 9 | yes* | `/api/v1/education/articles/` | READY — backend contract available |
-| Saran Gizi | 9 | yes* | `/api/v1/education/articles/?type=nutrition` | READY — general nutrition only |
-| FAQ / Help | 10 | yes/no | `/api/v1/education/articles/?type=help` | READY — backend contract available |
+| Education (articles/categories/detail) | 9 | yes* | `/api/v1/education/articles/`, `/api/v1/education/categories/` | COMPLETED — Home shortcut, search/category filters, pagination, safe detail |
+| Saran Gizi | 9 | yes* | `/api/v1/education/articles/?type=nutrition` | COMPLETED — general nutrition only; no Screening personalization |
+| FAQ / Help | 10 | yes* | `/api/v1/education/articles/?type=help` | COMPLETED — backend-backed list/detail; no fabricated support contact |
 | Account | 3 | yes | `/api/v1/accounts/profile/` | view supported fields and Patient link status |
 | Edit Profile | 3 | yes | `PATCH /api/v1/accounts/profile/` | email/roles/2FA immutable |
-| Change Password | 3/10 | yes | `/api/v1/accounts/change-password/` | invalidates JWT sessions |
-| Privacy Policy | 10 | yes/no | static | approved content only |
-| Help | 10 | yes/no | `/api/v1/education/articles/?type=help` | no fabricated contacts |
+| Change Password | 10 | yes | `/api/v1/accounts/change-password/` | COMPLETED — invalidates JWT sessions and returns to login |
+| Privacy information | 10 | yes | static | COMPLETED — concise product information, no legal certification claims |
+| Help | 10 | yes | `/api/v1/education/articles/?type=help` | COMPLETED — no fabricated contacts |
+| About HepaSense | 10 | yes | static | COMPLETED — app version and screening-support position |
 
-*Education/Help may be reachable from Home and/or Account.
+*The backend content is public, but Education remains inside the authenticated shell for MVP consistency. Help remains Phase 10.
 
 ## Navigation notes
 

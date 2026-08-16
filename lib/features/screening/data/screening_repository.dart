@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'dart:typed_data';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_error.dart';
@@ -29,6 +30,12 @@ class ScreeningDetailAvailable extends ScreeningDetailResult {
 
 class ScreeningDetailNotFound extends ScreeningDetailResult {
   const ScreeningDetailNotFound();
+}
+
+class ScreeningReportDocument {
+  const ScreeningReportDocument({required this.bytes, required this.filename});
+  final Uint8List bytes;
+  final String filename;
 }
 
 class ScreeningRepository {
@@ -75,6 +82,40 @@ class ScreeningRepository {
       if (error.response?.statusCode == 404) {
         return const ScreeningDetailNotFound();
       }
+      throw ApiError.fromDioException(error);
+    }
+  }
+
+  Future<ScreeningReportDocument> downloadReport(int id) async {
+    try {
+      final response = await _api.dio.get<List<int>>(
+        '/api/v1/screenings/$id/report/',
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final disposition = response.headers.value('content-disposition') ?? '';
+      final filename =
+          RegExp(
+            r'filename="(hepasense-hasil-skrining-\d{8}\.pdf)"',
+          ).firstMatch(disposition)?.group(1) ??
+          'hepasense-hasil-skrining.pdf';
+      return ScreeningReportDocument(
+        bytes: Uint8List.fromList(response.data ?? const []),
+        filename: filename,
+      );
+    } on DioException catch (error) {
+      throw ApiError.fromDioException(error);
+    }
+  }
+
+  Future<String> emailReport(int id) async {
+    try {
+      final response = await _api.dio.post<Map<String, dynamic>>(
+        '/api/v1/screenings/$id/email-report/',
+        data: const <String, dynamic>{},
+      );
+      return response.data?['message'] as String? ??
+          'Hasil skrining telah dikirim ke email Anda.';
+    } on DioException catch (error) {
       throw ApiError.fromDioException(error);
     }
   }

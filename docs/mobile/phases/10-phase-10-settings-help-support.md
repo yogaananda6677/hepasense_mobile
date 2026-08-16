@@ -1,12 +1,12 @@
-# HepaSense Mobile — Phase 10: Settings, Help, Privacy & Account Completion
+# HepaSense Mobile — Phase 10 Planning Record: Account & Support
 
 ## 1. Objective
 
-Complete the supporting surfaces that depend only on already-available contracts: Account screen completion (view/edit supported fields, change password already implemented in Phase 3), Help content, Privacy Policy, app information, and Logout. Education/Help content is restricted to approved/static information; report-by-email remains deferred unless a backend contract exists.
+Completed supporting surfaces: the Account hub reuses Phase 3 profile/edit state; password change is implemented here from the frozen contract; Help is backend-backed; Privacy and app information are conservative static content; Logout reuses the existing lifecycle. The executed scope is recorded in `10-phase-10-settings-account.md` and the single Phase 10 report.
 
 ## 2. Why This Phase Exists
 
-After the core authenticated flows (Phases 2–7), the app needs a complete, consistent Settings/Account/Help/Privacy shell to reach MVP completeness (PRD §254, §94). Phase 10 is intentionally low-risk and **does not** require new backend contracts (it reuses profile/change-password/logout already implemented). Phase 9 (Education) is blocked and must not block Phase 10.
+After the core authenticated flows, the app needs a complete, consistent Account/Help/Privacy shell. Phase 10 reuses profile/logout contracts and the completed Phase 9 Education repository for `type=help`.
 
 ## 3. Required Reading
 

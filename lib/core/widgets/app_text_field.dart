@@ -64,6 +64,9 @@ class _AppTextFieldState extends State<AppTextField> {
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.obscureText
             ? IconButton(
+                tooltip: _obscureText
+                    ? 'Tampilkan password'
+                    : 'Sembunyikan password',
                 icon: Icon(
                   _obscureText ? Icons.visibility_off : Icons.visibility,
                 ),

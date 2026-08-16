@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../data/models/register_request.dart';
 import '../../domain/auth_status.dart';
@@ -93,79 +94,92 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                AppTextField(
-                  label: 'Nama Depan',
-                  controller: _firstNameController,
-                  textInputAction: TextInputAction.next,
-                  validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  label: 'Nama Belakang',
-                  controller: _lastNameController,
-                  textInputAction: TextInputAction.next,
-                  validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  label: 'Email',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Wajib diisi';
-                    if (!v.contains('@')) return 'Email tidak valid';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  label: 'Nomor Telepon',
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.next,
-                  validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Wajib diisi' : null,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  label: 'Kata Sandi',
-                  controller: _passwordController,
-                  obscureText: true,
-                  textInputAction: TextInputAction.next,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return 'Wajib diisi';
-                    if (v.length < 8) return 'Minimal 8 karakter';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  label: 'Konfirmasi Kata Sandi',
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  textInputAction: TextInputAction.done,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return 'Wajib diisi';
-                    if (v != _passwordController.text) {
-                      return 'Kata sandi tidak cocok';
-                    }
-                    return null;
-                  },
-                  onFieldSubmitted: (_) async => _submit(),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                AppButton(
-                  onPressed: _isSubmitting ? null : _submit,
-                  text: 'Daftar',
-                  isLoading: _isSubmitting,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextButton(
-                  onPressed: () => context.pop(),
-                  child: const Text('Sudah punya akun? Masuk'),
+                AppCard(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppTextField(
+                        label: 'Nama Depan',
+                        controller: _firstNameController,
+                        textInputAction: TextInputAction.next,
+                        validator: (v) => v == null || v.trim().isEmpty
+                            ? 'Wajib diisi'
+                            : null,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        label: 'Nama Belakang',
+                        controller: _lastNameController,
+                        textInputAction: TextInputAction.next,
+                        validator: (v) => v == null || v.trim().isEmpty
+                            ? 'Wajib diisi'
+                            : null,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        label: 'Email',
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return 'Wajib diisi';
+                          }
+                          if (!v.contains('@')) return 'Email tidak valid';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        label: 'Nomor Telepon',
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                        validator: (v) => v == null || v.trim().isEmpty
+                            ? 'Wajib diisi'
+                            : null,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        label: 'Kata Sandi',
+                        controller: _passwordController,
+                        obscureText: true,
+                        textInputAction: TextInputAction.next,
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Wajib diisi';
+                          if (v.length < 8) return 'Minimal 8 karakter';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        label: 'Konfirmasi Kata Sandi',
+                        controller: _confirmPasswordController,
+                        obscureText: true,
+                        textInputAction: TextInputAction.done,
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Wajib diisi';
+                          if (v != _passwordController.text) {
+                            return 'Kata sandi tidak cocok';
+                          }
+                          return null;
+                        },
+                        onFieldSubmitted: (_) async => _submit(),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      AppButton(
+                        onPressed: _isSubmitting ? null : _submit,
+                        text: 'Daftar',
+                        isLoading: _isSubmitting,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextButton(
+                        onPressed: () => context.pop(),
+                        child: const Text('Sudah punya akun? Masuk'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

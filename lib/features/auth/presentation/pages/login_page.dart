@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../domain/auth_status.dart';
 import '../controllers/auth_controller.dart';
@@ -80,45 +81,53 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                AppTextField(
-                  label: 'Email',
-                  hint: 'Masukkan email Anda',
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  controller: _emailController,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Email wajib diisi';
-                    }
-                    if (!value.contains('@')) return 'Email tidak valid';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  label: 'Kata Sandi',
-                  hint: 'Masukkan kata sandi',
-                  obscureText: true,
-                  textInputAction: TextInputAction.done,
-                  controller: _passwordController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Kata sandi wajib diisi';
-                    }
-                    return null;
-                  },
-                  onFieldSubmitted: (_) async => _submit(),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                AppButton(
-                  onPressed: _isSubmitting ? null : _submit,
-                  text: 'Masuk',
-                  isLoading: _isSubmitting,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextButton(
-                  onPressed: () => context.push(AppRoutes.register),
-                  child: const Text('Belum punya akun? Daftar'),
+                AppCard(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppTextField(
+                        label: 'Email',
+                        hint: 'Masukkan email Anda',
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        controller: _emailController,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Email wajib diisi';
+                          }
+                          if (!value.contains('@')) return 'Email tidak valid';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        label: 'Kata Sandi',
+                        hint: 'Masukkan kata sandi',
+                        obscureText: true,
+                        textInputAction: TextInputAction.done,
+                        controller: _passwordController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Kata sandi wajib diisi';
+                          }
+                          return null;
+                        },
+                        onFieldSubmitted: (_) async => _submit(),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      AppButton(
+                        onPressed: _isSubmitting ? null : _submit,
+                        text: 'Masuk',
+                        isLoading: _isSubmitting,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextButton(
+                        onPressed: () => context.push(AppRoutes.register),
+                        child: const Text('Belum punya akun? Daftar'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

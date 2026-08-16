@@ -7,8 +7,6 @@ class AppConfig {
   final String apiBaseUrl;
 
   static const String _defaultDevelopmentUrl = 'http://10.0.2.2:8000';
-  static const String _defaultStagingUrl = 'https://staging-api.hepasense.com';
-  static const String _defaultProductionUrl = 'https://api.hepasense.com';
 
   factory AppConfig.fromDefines({String? appEnv, String? apiBaseUrl}) {
     final env = _parseEnvironment(appEnv);
@@ -33,13 +31,14 @@ class AppConfig {
       case AppEnvironment.development:
         return _defaultDevelopmentUrl;
       case AppEnvironment.staging:
-        return _defaultStagingUrl;
+        return '';
       case AppEnvironment.production:
-        return _defaultProductionUrl;
+        return '';
     }
   }
 
   bool get isDevelopment => environment == AppEnvironment.development;
   bool get isStaging => environment == AppEnvironment.staging;
   bool get isProduction => environment == AppEnvironment.production;
+  bool get isApiConfigured => apiBaseUrl.isNotEmpty;
 }

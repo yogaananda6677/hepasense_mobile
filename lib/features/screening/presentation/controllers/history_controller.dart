@@ -10,11 +10,15 @@ import '../../domain/history_state.dart';
 class HistoryController extends Notifier<HistoryState> {
   bool _active = false;
   bool _requestInFlight = false;
+  int _generation = 0;
 
   @override
   HistoryState build() {
     _active = true;
-    ref.onDispose(() => _active = false);
+    ref.onDispose(() {
+      _active = false;
+      _generation++;
+    });
     ref.watch(patientControllerProvider);
     return const HistoryInitial();
   }
@@ -24,39 +28,43 @@ class HistoryController extends Notifier<HistoryState> {
         _requestInFlight) {
       return;
     }
+    final request = ++_generation;
     _requestInFlight = true;
     state = const HistoryLoading();
     try {
       final page = await ref.read(screeningRepositoryProvider).history(page: 1);
-      if (!_active) return;
+      if (!_active || request != _generation) return;
       state = HistoryLoaded(
         items: page.results,
         page: 1,
         hasNext: page.hasNext,
       );
     } on ApiError catch (error) {
-      if (_active) state = HistoryFailure(error.message);
+      if (_active && request == _generation) {
+        state = HistoryFailure(error.message);
+      }
     } catch (_) {
-      if (_active) {
+      if (_active && request == _generation) {
         state = const HistoryFailure(
           'Riwayat pemeriksaan belum dapat dimuat. Coba lagi.',
         );
       }
     } finally {
-      _requestInFlight = false;
+      if (request == _generation) _requestInFlight = false;
     }
   }
 
   Future<void> refresh() async {
     final current = state;
     if (current is! HistoryLoaded || _requestInFlight) return;
+    final request = ++_generation;
     _requestInFlight = true;
     state = current.copyWith(isRefreshing: true, clearNextPageError: true);
     try {
       final page = await ref
           .read(screeningRepositoryProvider)
           .history(page: 1, status: current.filter);
-      if (!_active) return;
+      if (!_active || request != _generation) return;
       state = HistoryLoaded(
         items: page.results,
         page: 1,
@@ -64,14 +72,14 @@ class HistoryController extends Notifier<HistoryState> {
         filter: current.filter,
       );
     } on ApiError catch (error) {
-      if (_active) {
+      if (_active && request == _generation) {
         state = current.copyWith(
           isRefreshing: false,
           nextPageError: error.message,
         );
       }
     } finally {
-      _requestInFlight = false;
+      if (request == _generation) _requestInFlight = false;
     }
   }
 
@@ -80,6 +88,7 @@ class HistoryController extends Notifier<HistoryState> {
     if (current is! HistoryLoaded || !current.hasNext || _requestInFlight) {
       return;
     }
+    final request = _generation;
     _requestInFlight = true;
     state = current.copyWith(isLoadingMore: true, clearNextPageError: true);
     try {
@@ -87,7 +96,7 @@ class HistoryController extends Notifier<HistoryState> {
       final page = await ref
           .read(screeningRepositoryProvider)
           .history(page: nextPage, status: current.filter);
-      if (!_active) return;
+      if (!_active || request != _generation) return;
       final byId = {for (final item in current.items) item.id: item};
       for (final item in page.results) {
         byId[item.id] = item;
@@ -99,14 +108,14 @@ class HistoryController extends Notifier<HistoryState> {
         filter: current.filter,
       );
     } on ApiError catch (error) {
-      if (_active) {
+      if (_active && request == _generation) {
         state = current.copyWith(
           isLoadingMore: false,
           nextPageError: error.message,
         );
       }
     } finally {
-      _requestInFlight = false;
+      if (request == _generation) _requestInFlight = false;
     }
   }
 
@@ -117,13 +126,14 @@ class HistoryController extends Notifier<HistoryState> {
         ref.read(patientControllerProvider) is! PatientLinked) {
       return;
     }
+    final request = ++_generation;
     _requestInFlight = true;
     state = const HistoryLoading();
     try {
       final page = await ref
           .read(screeningRepositoryProvider)
           .history(page: 1, status: filter);
-      if (!_active) return;
+      if (!_active || request != _generation) return;
       state = HistoryLoaded(
         items: page.results,
         page: 1,
@@ -131,9 +141,11 @@ class HistoryController extends Notifier<HistoryState> {
         filter: filter,
       );
     } on ApiError catch (error) {
-      if (_active) state = HistoryFailure(error.message);
+      if (_active && request == _generation) {
+        state = HistoryFailure(error.message);
+      }
     } finally {
-      _requestInFlight = false;
+      if (request == _generation) _requestInFlight = false;
     }
   }
 }

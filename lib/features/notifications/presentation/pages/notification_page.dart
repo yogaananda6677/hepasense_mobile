@@ -6,6 +6,7 @@ import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/jakarta_datetime.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_bottom_navigation.dart';
 import '../../../../core/widgets/state_view.dart';
 import '../../data/notification_providers.dart';
 import '../../domain/app_notification.dart';
@@ -70,25 +71,7 @@ class _NotificationPageViewState extends ConsumerState<NotificationPageView> {
         ],
       ),
       body: SafeArea(child: _body(state)),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        onDestinationSelected: (index) {
-          if (index == 0) context.go(AppRoutes.home);
-          if (index == 1) context.push(AppRoutes.screeningHistory);
-          if (index == 2) context.push(AppRoutes.account);
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            label: 'Beranda',
-          ),
-          NavigationDestination(icon: Icon(Icons.history), label: 'Riwayat'),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            label: 'Akun',
-          ),
-        ],
-      ),
+      bottomNavigationBar: const AppBottomNavigation(selectedIndex: 0),
     );
   }
 

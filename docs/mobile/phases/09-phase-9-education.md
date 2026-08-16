@@ -1,6 +1,6 @@
-# HepaSense Mobile — Phase 9: Education, General Nutrition & FAQ
+# HepaSense Mobile — Phase 9 Planning Record: Education & General Nutrition
 
-> **READY — BACKEND CONTRACT AVAILABLE.** Backend Phase 8 (`docs/backend/14-phase-8-education-content.md`, COMPLETED 2026-08-12) implements a public read-only Education API. The mobile PRD §44/§80/§1255 previously listed Education as "backend pending"; that contract is now implemented. Nutrition is **general education only** — no Screening-based personalization (PRD §1255, §1260–1268).
+> **COMPLETED.** The executed scope and final validation are documented in `09-phase-9-education-nutrition-help.md` and the single Phase 9 report. Help/FAQ remains Phase 10 per the authoritative screen map.
 
 ## 1. Objective
 
@@ -59,7 +59,7 @@ The app exposes Help/Supporting content (PRD §254 screen map). Backend Phase 8 
 | GET | `/api/v1/education/categories/` | AllowAny (public) | — | active categories + public-content counts |
 | GET | `/api/v1/education/categories/{slug}/` | AllowAny (public) | — | active public category detail |
 
-List fields: `id, type, title, slug, summary, thumbnail_url, is_featured, read_time, published_at, category`. Detail adds `content, updated_at`. Excluded: editor identity, management state, SEO internals, view statistics, credentials, all patient/screening/biometric/notification/Firebase data (Backend Phase 8 §44–46). POST/PUT/PATCH/DELETE → 405 (Backend Phase 8 §31). Personalization parameters rejected (Backend Phase 8 §48, §125). Invalid `type`/boolean → 400. `search` >200 chars rejected (Backend Phase 9 §125).
+List fields: `id, type, title, slug, summary, thumbnail, is_featured, read_time_minutes, published_at, category`. Detail adds `content, updated_at`. Excluded: editor identity, management state, SEO internals, view statistics, credentials, all patient/screening/biometric/notification/Firebase data (Backend Phase 8 §44–46). POST/PUT/PATCH/DELETE → 405 (Backend Phase 8 §31). Personalization parameters rejected (Backend Phase 8 §48, §125). Invalid `type`/boolean → 400. `search` >200 chars rejected (Backend Phase 9 §125).
 
 Education is public (`AllowAny`) and contains no user or medical data (Backend Phase 8 §19). The mobile client should still render via the authenticated app shell for MVP consistency unless Figma dictates guest access.
 

@@ -15,14 +15,26 @@ class SecureStorage {
   }
 
   Future<void> write({required String key, required String value}) async {
-    await _storage.write(key: key, value: value);
+    try {
+      await _storage.write(key: key, value: value);
+    } catch (_) {
+      // Secure-storage availability must not crash an otherwise valid session.
+    }
   }
 
   Future<void> delete({required String key}) async {
-    await _storage.delete(key: key);
+    try {
+      await _storage.delete(key: key);
+    } catch (_) {
+      // In-memory credentials are still cleared by TokenRepository.
+    }
   }
 
   Future<void> deleteAll() async {
-    await _storage.deleteAll();
+    try {
+      await _storage.deleteAll();
+    } catch (_) {
+      // Treat an unavailable platform keystore as an already-cleared store.
+    }
   }
 }

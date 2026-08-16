@@ -23,15 +23,17 @@ void main() {
       expect(config.isProduction, isTrue);
     });
 
-    test('uses default URL when no custom URL provided', () {
+    test('only development has an intentional default URL', () {
       final devConfig = AppConfig.fromDefines(appEnv: 'development');
       expect(devConfig.apiBaseUrl, contains('10.0.2.2'));
 
       final stagingConfig = AppConfig.fromDefines(appEnv: 'staging');
-      expect(stagingConfig.apiBaseUrl, contains('staging'));
+      expect(stagingConfig.apiBaseUrl, isEmpty);
+      expect(stagingConfig.isApiConfigured, isFalse);
 
       final prodConfig = AppConfig.fromDefines(appEnv: 'production');
-      expect(prodConfig.apiBaseUrl, contains('api.hepasense'));
+      expect(prodConfig.apiBaseUrl, isEmpty);
+      expect(prodConfig.isApiConfigured, isFalse);
     });
 
     test('uses custom URL when provided', () {
@@ -45,6 +47,16 @@ void main() {
     test('never returns empty URL', () {
       final config = AppConfig.fromDefines();
       expect(config.apiBaseUrl.isNotEmpty, isTrue);
+      expect(config.isApiConfigured, isTrue);
+    });
+
+    test('production accepts only an explicit deployment URL', () {
+      final config = AppConfig.fromDefines(
+        appEnv: 'production',
+        apiBaseUrl: 'https://mobile-api.example.test',
+      );
+      expect(config.apiBaseUrl, 'https://mobile-api.example.test');
+      expect(config.isApiConfigured, isTrue);
     });
 
     test('case insensitive environment parsing', () {

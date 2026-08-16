@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -559,6 +560,33 @@ void main() {
         () => mockSecureStorage.delete(key: SecureKeys.refreshToken),
       ).called(1);
     });
+  });
+
+  test('logout rejects a successful login response still in flight', () async {
+    final response = Completer<LoginResponse>();
+    when(
+      () => mockAuthRepository.login(any()),
+    ).thenAnswer((_) => response.future);
+    when(() => mockAuthRepository.logout()).thenAnswer((_) async {});
+
+    final container = createContainer();
+    final login = container
+        .read(authControllerProvider.notifier)
+        .login('patient@example.com', 'password');
+    await Future<void>.delayed(Duration.zero);
+    await container.read(authControllerProvider.notifier).logout();
+
+    response.complete(
+      LoginResponse(
+        requiresMfa: false,
+        tokens: const TokenPair(accessToken: 'new', refreshToken: 'new-r'),
+        user: _testUser,
+      ),
+    );
+    await login;
+
+    expect(container.read(authControllerProvider), isA<AuthUnauthenticated>());
+    verifyNever(() => mockTokenRepository.saveTokens(any()));
   });
 
   group('RefreshInterceptor', () {

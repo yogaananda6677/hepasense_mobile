@@ -39,13 +39,13 @@ class StatusBadge extends StatelessWidget {
   Color _backgroundColor(BuildContext context) {
     switch (status) {
       case ScreenStatus.healthy:
-        return AppColors.statusHealthy.withValues(alpha: 0.1);
+        return AppColors.statusHealthySurface;
       case ScreenStatus.warning:
-        return AppColors.statusWarning.withValues(alpha: 0.1);
+        return AppColors.statusWarningSurface;
       case ScreenStatus.highRisk:
-        return AppColors.statusHighRisk.withValues(alpha: 0.1);
+        return AppColors.statusHighRiskSurface;
       case ScreenStatus.invalid:
-        return AppColors.statusInvalid.withValues(alpha: 0.1);
+        return AppColors.statusInvalidSurface;
     }
   }
 

@@ -4,12 +4,17 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/errors/status_mapping.dart';
 import '../../core/routing/routes.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/theme/spacing.dart';
 import '../../core/utils/jakarta_datetime.dart';
 import '../../core/widgets/app_button.dart';
+import '../../core/widgets/app_bottom_navigation.dart';
+import '../../core/widgets/app_card.dart';
 import '../../core/widgets/state_view.dart';
 import '../../core/widgets/status_badge.dart';
 import '../auth/presentation/controllers/auth_controller.dart';
+import '../education/data/education_providers.dart';
+import '../education/domain/education_state.dart';
 import '../notifications/data/notification_providers.dart';
 import '../notifications/domain/notification_state.dart';
 import '../patient/data/patient_providers.dart';
@@ -32,6 +37,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(unreadCountControllerProvider.notifier).load();
+      if (ref.read(educationControllerProvider) is EducationInitial) {
+        ref.read(educationControllerProvider.notifier).loadInitial();
+      }
     });
   }
 
@@ -41,7 +49,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final unread = ref.watch(unreadCountControllerProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HepaSense'),
+        backgroundColor: AppColors.primaryDark,
+        foregroundColor: Colors.white,
+        title: const Row(
+          children: [
+            Icon(Icons.monitor_heart_outlined, size: 20),
+            SizedBox(width: 8),
+            Text('Beranda Kesehatan'),
+          ],
+        ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -53,38 +69,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               label: unread is UnreadCountReady
                   ? Text(unread.count > 99 ? '99+' : unread.count.toString())
                   : null,
-              child: const Icon(Icons.notifications_outlined),
+              child: const Icon(Icons.notifications_outlined, size: 20),
             ),
             onPressed: () => context.push(AppRoutes.notifications),
-          ),
-          IconButton(
-            tooltip: 'Akun',
-            icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () => context.push(AppRoutes.account),
           ),
         ],
       ),
       body: SafeArea(child: _patientGate(context, ref, patientState)),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        onDestinationSelected: (index) {
-          if (index == 1) context.push(AppRoutes.screeningHistory);
-          if (index == 2) context.push(AppRoutes.account);
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          NavigationDestination(icon: Icon(Icons.history), label: 'Riwayat'),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Akun',
-          ),
-        ],
-      ),
+      bottomNavigationBar: const AppBottomNavigation(selectedIndex: 0),
     );
   }
 
@@ -96,6 +88,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       PatientLinked(:final patient) => _LinkedHome(patient: patient),
       PatientUnlinked() => _UnlinkedPatient(
+        onRetry: () => ref.read(patientControllerProvider.notifier).load(),
         onLogout: () => ref.read(authControllerProvider.notifier).logout(),
       ),
       PatientFailure(:final message) => StateView(
@@ -114,56 +107,30 @@ class _LinkedHome extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeControllerProvider);
+    final education = ref.watch(educationControllerProvider);
     return RefreshIndicator(
-      onRefresh: () => ref.read(homeControllerProvider.notifier).load(),
+      onRefresh: () async {
+        await ref.read(homeControllerProvider.notifier).load();
+        await ref.read(educationControllerProvider.notifier).refresh();
+      },
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 20),
         children: [
+          _WelcomeHeader(patient: patient),
+          const SizedBox(height: 12),
+          _HealthSummary(state: home),
+          const SizedBox(height: 16),
           Text(
-            'Selamat datang,',
-            style: Theme.of(context).textTheme.titleMedium,
+            'Hasil Pemeriksaan Terakhir',
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            patient.fullName.isEmpty ? 'Pengguna HepaSense' : patient.fullName,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Pantau hasil skrining terbaru Anda.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Kode pasien: ${patient.patientCode}',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: 8),
           _latest(context, ref, home),
-          const SizedBox(height: AppSpacing.lg),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  const Expanded(
-                    child: Text(
-                      'HepaSense merupakan alat bantu skrining awal dan bukan diagnosis medis.',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          const SizedBox(height: 20),
+          Text('Tips Kesehatan', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          _TipsSection(state: education),
         ],
       ),
     );
@@ -172,32 +139,37 @@ class _LinkedHome extends ConsumerWidget {
   Widget _latest(BuildContext context, WidgetRef ref, HomeState state) {
     return switch (state) {
       HomeInitial() || HomeLoading() => const SizedBox(
-        height: 220,
+        height: 112,
         child: StateView(
           state: ViewState.loading,
           loadingMessage: 'Memuat hasil skrining terbaru...',
         ),
       ),
       HomeNoScreening() => _LatestShell(
-        child: Column(
+        child: Row(
           children: [
-            const Icon(Icons.assignment_outlined, size: 48),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Belum ada hasil skrining',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            const Text(
-              'Hasil pemeriksaan terbaru akan muncul di sini.',
-              textAlign: TextAlign.center,
+            const Icon(Icons.assignment_outlined, size: 36),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Belum ada hasil skrining',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 2),
+                  const Text('Hasil pemeriksaan terbaru akan muncul di sini.'),
+                ],
+              ),
             ),
           ],
         ),
       ),
       HomeLatest(:final screening) => _LatestCard(screening: screening),
       HomeFailure(:final message) => SizedBox(
-        height: 240,
+        height: 224,
         child: StateView(
           state: ViewState.error,
           errorMessage: message,
@@ -216,48 +188,43 @@ class _LatestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final invalid = !screening.sampleValid;
     return _LatestShell(
+      emphasized: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            'Skrining Terbaru',
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
+          const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Skrining Terbaru',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
               StatusBadge(status: screening.status),
+              Text(
+                JakartaDateTime.display(screening.measuredAt),
+                textAlign: TextAlign.end,
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
-          Icon(
-            invalid ? Icons.refresh_outlined : Icons.monitor_heart_outlined,
-            size: 56,
-            color: invalid
-                ? Theme.of(context).colorScheme.outline
-                : Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 12),
+          _MeasurementSummary(measurement: screening.measurement),
+          const SizedBox(height: 18),
+          Text('Kesimpulan', style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 4),
           Text(
             invalid
                 ? 'Sampel pemeriksaan belum dapat digunakan.'
                 : StatusMapping.descriptionFor(screening.status),
             style: Theme.of(context).textTheme.bodyLarge,
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.start,
           ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            JakartaDateTime.display(screening.measuredAt),
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: 14),
           AppButton(
-            text: 'Lihat Detail',
-            onPressed: () => context.push(
-              AppRoutes.screeningDetailPath(screening.id.toString()),
-            ),
-            variant: AppButtonVariant.outline,
+            key: const Key('home-history-cta'),
+            text: 'Lihat Riwayat Lengkap',
+            onPressed: () => context.go(AppRoutes.screeningHistory),
           ),
         ],
       ),
@@ -265,19 +232,287 @@ class _LatestCard extends StatelessWidget {
   }
 }
 
-class _LatestShell extends StatelessWidget {
-  const _LatestShell({required this.child});
-  final Widget child;
+class _WelcomeHeader extends StatelessWidget {
+  const _WelcomeHeader({required this.patient});
+
+  final Patient patient;
 
   @override
-  Widget build(BuildContext context) => Card(
-    clipBehavior: Clip.antiAlias,
-    child: Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: child),
+  Widget build(BuildContext context) {
+    final name = patient.fullName.isEmpty
+        ? 'Pengguna HepaSense'
+        : patient.fullName;
+    final initial = name.trim().isEmpty ? 'H' : name.trim()[0].toUpperCase();
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.primarySoft,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.accent, width: 1.5),
+          ),
+          child: Text(
+            initial,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: AppColors.primary),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Halo, Selamat Datang',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: AppColors.primary),
+              ),
+              Text(
+                patient.patientCode,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LatestShell extends StatelessWidget {
+  const _LatestShell({required this.child, this.emphasized = false});
+  final Widget child;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) => AppCard(
+    emphasized: emphasized,
+    padding: const EdgeInsets.all(16),
+    child: child,
+  );
+}
+
+class _HealthSummary extends StatelessWidget {
+  const _HealthSummary({required this.state});
+  final HomeState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final message = switch (state) {
+      HomeLatest(:final screening) when !screening.sampleValid =>
+        'Sampel terakhir belum valid dan perlu diulang.',
+      HomeLatest(:final screening) =>
+        'Hasil terakhir: ${StatusMapping.safeLabelFor(screening.status)}. Ini bukan diagnosis medis.',
+      HomeNoScreening() => 'Belum ada hasil skrining untuk dirangkum.',
+      HomeFailure() => 'Ringkasan belum dapat dimuat.',
+      _ => 'Menyiapkan ringkasan hasil skrining Anda...',
+    };
+    return Container(
+      key: const Key('home-health-summary'),
+      padding: const EdgeInsets.fromLTRB(14, 22, 14, 22),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.primarySoft, AppColors.background],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 16,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Kesehatan Anda Hari Ini',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 4),
+          Text(message, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+    );
+  }
+}
+
+class _MeasurementSummary extends StatelessWidget {
+  const _MeasurementSummary({required this.measurement});
+  final ScreeningMeasurement measurement;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      _item(
+        context,
+        Icons.science_outlined,
+        'NH3',
+        measurement.nh3Corrected,
+        measurement.nh3Unit,
+      ),
+      const SizedBox(height: 8),
+      _item(
+        context,
+        Icons.thermostat_outlined,
+        'Suhu',
+        measurement.temperatureCelsius,
+        '°C',
+      ),
+      const SizedBox(height: 8),
+      _item(
+        context,
+        Icons.water_drop_outlined,
+        'Kelembapan',
+        measurement.humidityPercent,
+        '%',
+      ),
+    ],
+  );
+
+  Widget _item(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String? value,
+    String? unit,
+  ) {
+    final parsed = double.tryParse(value ?? '');
+    final shown = parsed == null
+        ? '—'
+        : '${parsed.toStringAsFixed(parsed.truncateToDouble() == parsed ? 0 : 1)}${unit?.isNotEmpty == true ? ' $unit' : ''}';
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.infoSurface,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: AppColors.primarySoft,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 18, color: AppColors.accent),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: Theme.of(context).textTheme.labelSmall),
+              Text(shown, style: Theme.of(context).textTheme.titleSmall),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TipsSection extends StatelessWidget {
+  const _TipsSection({required this.state});
+  final EducationState state;
+
+  @override
+  Widget build(BuildContext context) {
+    if (state case EducationLoaded(:final items) when items.isNotEmpty) {
+      final article = items.first;
+      return _TipCard(
+        title: article.title,
+        summary: article.summary.isEmpty
+            ? 'Informasi kesehatan umum dari HepaSense.'
+            : article.summary,
+        onTap: article.slug.isEmpty
+            ? () => context.push(AppRoutes.education)
+            : () => context.push(AppRoutes.educationDetailPath(article.slug)),
+      );
+    }
+    return _TipCard(
+      title: 'Pentingnya Udara Bersih',
+      summary:
+          'Udara yang bersih membantu menjaga kenyamanan pernapasan dan kesehatan sehari-hari.',
+      onTap: () => context.push(AppRoutes.education),
+    );
+  }
+}
+
+class _TipCard extends StatelessWidget {
+  const _TipCard({
+    required this.title,
+    required this.summary,
+    required this.onTap,
+  });
+
+  final String title;
+  final String summary;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => AppCard(
+    semanticLabel: 'Buka artikel $title',
+    padding: EdgeInsets.zero,
+    onTap: onTap,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: Image.asset(
+            'assets/images/health_tips_banner.png',
+            width: double.infinity,
+            height: 112,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                summary,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
   );
 }
 
 class _UnlinkedPatient extends StatelessWidget {
-  const _UnlinkedPatient({required this.onLogout});
+  const _UnlinkedPatient({required this.onRetry, required this.onLogout});
+  final VoidCallback onRetry;
   final VoidCallback onLogout;
 
   @override
@@ -285,10 +520,12 @@ class _UnlinkedPatient extends StatelessWidget {
     padding: const EdgeInsets.all(AppSpacing.lg),
     children: [
       const SizedBox(height: AppSpacing.xl),
-      Icon(
-        Icons.person_off_outlined,
-        size: 72,
-        color: Theme.of(context).colorScheme.primary,
+      AppCard(
+        child: Icon(
+          Icons.person_off_outlined,
+          size: 72,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
       ),
       const SizedBox(height: AppSpacing.md),
       Text(
@@ -298,10 +535,12 @@ class _UnlinkedPatient extends StatelessWidget {
       ),
       const SizedBox(height: AppSpacing.sm),
       const Text(
-        'Akun Anda belum terhubung dengan data pasien HepaSense. Hubungi petugas layanan HepaSense untuk menghubungkan akun.',
+        'Akun HepaSense Anda sudah berhasil dibuat, tetapi belum terhubung dengan data pasien. Minta tenaga kesehatan menghubungkan akun menggunakan email yang Anda gunakan saat mendaftar.',
         textAlign: TextAlign.center,
       ),
       const SizedBox(height: AppSpacing.xl),
+      AppButton(text: 'Coba Lagi', onPressed: onRetry),
+      const SizedBox(height: AppSpacing.sm),
       AppButton(
         text: 'Keluar',
         onPressed: onLogout,

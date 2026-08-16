@@ -1,5 +1,13 @@
 # HepaSense Mobile — Design System (Phase 1)
 
+## Phase 10 account composition
+
+The Account screen follows the documented hierarchy of Figma frame `27:1685`: compact header, centered identity/avatar, 20 px margins, grouped 16 px-radius settings surfaces, consistent icon/label/chevron rows, separated logout action, and the existing BottomNav with Akun selected. Frame content for premium membership, plants, scan statistics, garden management, reports, language, and unsupported notification preferences is intentionally excluded. Runtime pixel comparison was unavailable because the single Figma context call was rate-limited.
+
+## Phase 9 content composition
+
+Education and Nutrition reuse the established HepaSense theme and navigation. The Phase 9 composition adapts Figma frame `27:1615` with 20 px content margins, a compact header, 4–20 px vertical rhythm, a tinted 12 px-radius information card, and stacked 16 px-radius article cards. Cards grow with Indonesian copy and use icons plus text rather than color alone. Plant/product imagery, ratings, prices, marketplace badges, shopping CTAs, and chatbot navigation are intentionally excluded.
+
 > **Phase 1 implemented.** Design tokens provisionally based on Material 3 defaults. Figma extraction deferred — exact values to be confirmed from Figma in a follow-up.
 
 ## Visual source of truth
@@ -121,7 +129,8 @@ No `.env` files. No dotenv package. No hardcoded URLs in feature code.
 
 ## Application ID status
 
-ANDROID APPLICATION ID: TEMPORARY — MUST BE FINALIZED BEFORE FIREBASE PHASE 8.
+ANDROID APPLICATION ID: FINAL.
 
-Android application ID and namespace are finalized as
-`com.yogaananda.hepasense`. Firebase registration has not yet been executed.
+Android application ID and namespace are `com.yogaananda.hepasense`.
+The Android Firebase client configuration is present and package-matched;
+real-device FID/FCM validation remains an external release check.

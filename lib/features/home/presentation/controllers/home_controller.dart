@@ -9,11 +9,15 @@ import '../../domain/home_state.dart';
 
 class HomeController extends Notifier<HomeState> {
   bool _active = false;
+  int _generation = 0;
 
   @override
   HomeState build() {
     _active = true;
-    ref.onDispose(() => _active = false);
+    ref.onDispose(() {
+      _active = false;
+      _generation++;
+    });
     final patient = ref.watch(patientControllerProvider);
     if (patient is PatientLinked) {
       Future<void>.microtask(load);
@@ -27,19 +31,20 @@ class HomeController extends Notifier<HomeState> {
       return;
     }
     if (state is HomeLoading) return;
+    final request = ++_generation;
     state = const HomeLoading();
     try {
       final result = await ref.read(screeningRepositoryProvider).latest();
-      if (!_active) return;
+      if (!_active || request != _generation) return;
       state = switch (result) {
         LatestAvailable(:final screening) => HomeLatest(screening),
         NoScreening() => const HomeNoScreening(),
       };
     } on ApiError catch (error) {
-      if (!_active) return;
+      if (!_active || request != _generation) return;
       state = HomeFailure(error.message);
     } catch (_) {
-      if (!_active) return;
+      if (!_active || request != _generation) return;
       state = const HomeFailure(
         'Hasil skrining belum dapat dimuat. Coba lagi.',
       );

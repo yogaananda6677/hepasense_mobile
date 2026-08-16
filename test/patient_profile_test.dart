@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:hepasense_mobile/core/network/api_client.dart';
+import 'package:hepasense_mobile/app/app.dart';
 import 'package:hepasense_mobile/core/storage/secure_keys.dart';
 import 'package:hepasense_mobile/core/theme/app_theme.dart';
 import 'package:hepasense_mobile/features/auth/domain/auth_status.dart';
@@ -55,8 +56,12 @@ class FixedPatientController extends PatientController {
   @override
   PatientState build() => value;
 
+  int loadCalls = 0;
+
   @override
-  Future<void> load() async {}
+  Future<void> load() async {
+    loadCalls++;
+  }
 }
 
 const patient = Patient(
@@ -192,6 +197,25 @@ void main() {
     });
   });
 
+  test(
+    'app resume refreshes linkage once only while Patient is unlinked',
+    () async {
+      var patientRefreshes = 0;
+      var homeRefreshes = 0;
+      await refreshPatientDataOnResume(
+        patient: const PatientUnlinked(),
+        refreshPatient: () async {
+          patientRefreshes++;
+        },
+        refreshHome: () async {
+          homeRefreshes++;
+        },
+      );
+      expect(patientRefreshes, 1);
+      expect(homeRefreshes, 0);
+    },
+  );
+
   group('Account profile contract', () {
     test('nullable account fields parse safely', () {
       final profile = AccountProfile.fromJson(profileJson);
@@ -270,12 +294,21 @@ void main() {
     testWidgets('unlinked state is safe, actionable, and has no claim action', (
       tester,
     ) async {
-      await tester.pumpWidget(app(const PatientUnlinked()));
+      final controller = FixedPatientController(const PatientUnlinked());
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [patientControllerProvider.overrideWith(() => controller)],
+          child: MaterialApp(theme: AppTheme.light, home: const HomeScreen()),
+        ),
+      );
       expect(find.text('Akun belum terhubung'), findsOneWidget);
       expect(
-        find.textContaining('Hubungi petugas layanan HepaSense'),
+        find.textContaining('email yang Anda gunakan saat mendaftar'),
         findsOneWidget,
       );
+      expect(find.text('Coba Lagi'), findsOneWidget);
+      await tester.tap(find.text('Coba Lagi'));
+      expect(controller.loadCalls, 1);
       expect(find.text('Keluar'), findsOneWidget);
       expect(find.textContaining('Buat pasien'), findsNothing);
       expect(find.textContaining('Klaim'), findsNothing);
@@ -352,6 +385,56 @@ void main() {
 
       expect(container.read(patientControllerProvider), isA<PatientInitial>());
     });
+
+    test('retry moves an unlinked authenticated account to linked', () async {
+      final repository = MockPatientRepository();
+      var calls = 0;
+      when(repository.getMe).thenAnswer((_) async {
+        calls++;
+        return calls == 1
+            ? const UnlinkedPatient()
+            : const LinkedPatient(patient);
+      });
+      final container = ProviderContainer(
+        overrides: [
+          authControllerProvider.overrideWith(MutableAuthController.new),
+          patientRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      container.read(patientControllerProvider);
+      await Future<void>.delayed(Duration.zero);
+      expect(container.read(patientControllerProvider), isA<PatientUnlinked>());
+      await container.read(patientControllerProvider.notifier).load();
+      expect(container.read(patientControllerProvider), isA<PatientLinked>());
+      expect(container.read(authControllerProvider), isA<Authenticated>());
+      verify(repository.getMe).called(2);
+    });
+
+    test(
+      'retry 404 remains unlinked without changing authentication',
+      () async {
+        final repository = MockPatientRepository();
+        when(repository.getMe).thenAnswer((_) async => const UnlinkedPatient());
+        final container = ProviderContainer(
+          overrides: [
+            authControllerProvider.overrideWith(MutableAuthController.new),
+            patientRepositoryProvider.overrideWithValue(repository),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        container.read(patientControllerProvider);
+        await Future<void>.delayed(Duration.zero);
+        await container.read(patientControllerProvider.notifier).load();
+        expect(
+          container.read(patientControllerProvider),
+          isA<PatientUnlinked>(),
+        );
+        expect(container.read(authControllerProvider), isA<Authenticated>());
+      },
+    );
 
     test('User B replaces User A Patient state after account switch', () async {
       const patientB = Patient(

@@ -53,16 +53,19 @@ class AppTheme {
         labelSmall: AppTypography.labelSmall,
       ),
       appBarTheme: const AppBarTheme(
-        centerTitle: true,
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.primary,
+        centerTitle: false,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 0,
+        titleTextStyle: AppTypography.titleLarge,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: AppColors.surfaceContainerLow,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          borderSide: const BorderSide(color: AppColors.outline),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
@@ -70,7 +73,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
@@ -82,17 +85,26 @@ class AppTheme {
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 48),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md),
+        style: ButtonStyle(
+          minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 52)),
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.pressed)
+                ? AppColors.primaryDark
+                : AppColors.primary,
+          ),
+          foregroundColor: const WidgetStatePropertyAll(AppColors.onPrimary),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
           ),
         ),
       ),
       cardTheme: CardThemeData(
+        color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           side: const BorderSide(color: AppColors.outlineVariant),
         ),
         margin: const EdgeInsets.symmetric(
@@ -100,6 +112,29 @@ class AppTheme {
           vertical: AppSpacing.sm,
         ),
       ),
+      scaffoldBackgroundColor: AppColors.background,
+      navigationBarTheme: NavigationBarThemeData(
+        height: 68,
+        backgroundColor: AppColors.navigationBackground,
+        indicatorColor: AppColors.navigationActive,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          return AppTypography.labelSmall.copyWith(
+            color: states.contains(WidgetState.selected)
+                ? AppColors.navigationActive
+                : AppColors.onSurfaceVariant,
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w700
+                : FontWeight.w500,
+          );
+        }),
+      ),
+      chipTheme: ChipThemeData(
+        shape: const StadiumBorder(),
+        side: const BorderSide(color: AppColors.outlineVariant),
+        selectedColor: AppColors.secondaryContainer,
+        backgroundColor: AppColors.surfaceLowest,
+      ),
+      dividerTheme: const DividerThemeData(color: AppColors.divider),
     );
   }
 }

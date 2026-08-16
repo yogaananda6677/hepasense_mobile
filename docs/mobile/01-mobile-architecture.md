@@ -1,5 +1,13 @@
 # HepaSense Mobile — Architecture & Decisions
 
+## Phase 10 account and support module
+
+Phase 10 composes the existing Phase 3 `ProfileController`, `PatientController`, Edit Profile route, Phase 2 logout, and Phase 8 push-device logout behavior. It adds a narrowly scoped password repository/controller with no password values in Riverpod state or storage. Successful password change shows feedback, clears local password controllers, invalidates tokens, and returns through the existing auth guard. Help reuses the Phase 9 Education API model/repository with `type=help`; Privacy and About are dependency-free static product information.
+
+## Phase 9 education module
+
+`features/education` follows the existing data/domain/presentation split. `EducationRepository` uses the shared Dio client for the frozen public read-only API; Riverpod Notifiers own list/filter/pagination and detail state. The authenticated router exposes `/education` and `/education/:slug`, with a Home shortcut and the existing application navigation. Article bodies use a centralized dependency-free safe text renderer that recognizes only headings and list markers and never executes HTML, scripts, remote images, or links.
+
 > Backend Phases 1–11 are COMPLETED, core is CLOSED, and the API contract is FROZEN. Use backend `20-final-api-contract.md` and `21-flutter-integration-contract.md`.
 
 **Status:** Baseline, established by Phase 0 (repository audit).
@@ -132,10 +140,10 @@ UI
 
 ## 5. Auth boundary
 
-- Access token: short-lived JWT, stored in `flutter_secure_storage`.
+- Access token: short-lived JWT, held in process memory only.
 - Refresh token: rotatable JWT with blacklist, stored in `flutter_secure_storage`.
 - MFA: password login may return a signed, cached, 5-minute one-time challenge with `requires_2fa=true` instead of JWTs; the app routes to the OTP screen; `POST /api/v1/auth/2fa/login/` exchanges `{challenge, otp_code}` for final JWTs carrying `mfa_verified=true` (Backend Phase 1 §40–51).
-  - The MFA challenge is sensitive temporary material: store in secure storage (not memory-only across process death is acceptable; do **not** log it — PRD §54, §1055).
+  - The MFA challenge is sensitive temporary material held only for the active in-memory login attempt; it is cleared on completion/reset and never logged.
 - Logout: call `POST /api/v1/auth/logout/`, clear local access/refresh state, clear sensitive in-memory data, reset protected navigation to Login (PRD §42, §1201).
 - Protected routes: auth guard redirects to Login when no valid session exists (PRD §12).
 - Password change invalidates JWT sessions server-side (Backend Phase 1 §73); the app clears local auth state and returns to Login if the backend returns 401 (PRD §41, §1190).

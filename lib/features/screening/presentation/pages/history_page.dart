@@ -7,6 +7,8 @@ import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/jakarta_datetime.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_bottom_navigation.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/state_view.dart';
 import '../../../../core/widgets/status_badge.dart';
 import '../../../patient/data/patient_providers.dart';
@@ -60,24 +62,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
         centerTitle: false,
       ),
       body: SafeArea(child: _body(patient, history)),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 1,
-        onDestinationSelected: (index) {
-          if (index == 0) context.go(AppRoutes.home);
-          if (index == 2) context.push(AppRoutes.account);
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            label: 'Beranda',
-          ),
-          NavigationDestination(icon: Icon(Icons.history), label: 'Riwayat'),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            label: 'Akun',
-          ),
-        ],
-      ),
+      bottomNavigationBar: const AppBottomNavigation(selectedIndex: 1),
     );
   }
 
@@ -203,20 +188,12 @@ class _HistoryRow extends StatelessWidget {
       button: true,
       label:
           'Buka detail pemeriksaan ${StatusMapping.safeLabelFor(item.status)}',
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+      child: AppCard(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         onTap: () =>
             context.push(AppRoutes.screeningDetailPath(item.id.toString())),
-        child: Container(
+        child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 72),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-          ),
           child: Row(
             children: [
               Icon(

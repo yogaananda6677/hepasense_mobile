@@ -2,7 +2,7 @@
 
 > Backend Phases 1–11 are COMPLETED, core is CLOSED, and the API contract is FROZEN (145 tests + 18 subtests). Authoritative contracts: backend `20-final-api-contract.md` and `21-flutter-integration-contract.md`.
 
-**Execution status:** Mobile Phase 8 (Firebase Push/FID integration) is COMPLETED. Mobile Phase 9 is READY and not started.
+**Execution status:** Mobile Phase 12 final source-readiness audit is COMPLETED. No further mobile phase is planned. Distribution/runtime validation remains owner-controlled and is listed in the Phase 12 report.
 
 **Date:** 2026-08-12 (plan generation)
 **Mobile repo:** `/home/yoga/Data/TFS/hepasense_mobile/` (greenfield — contains only `prd.md` at audit)
@@ -93,16 +93,16 @@ Phase 8           Phase 9
 | 0 | Repository audit & architecture baseline | none | N/A (audit) | LOW | COMPLETED |
 | 1 | Foundation, routing, theme, design system | 0 | N/A | HIGH | COMPLETED |
 | 2 | Authentication, registration, MFA | 0,1 | Phase 1 COMPLETED | HIGH | **COMPLETED** |
-| 3 | Patient identity, profile, account, change password | 0,2 | Phase 1+2 COMPLETED | MEDIUM | READY |
-| 4 | Home dashboard & latest screening | 0,2,3 | Phase 2+4 COMPLETED | MEDIUM-HIGH | READY |
-| 5 | Screening history | 0,4 | Phase 4 COMPLETED | MEDIUM | READY |
-| 6 | Screening detail | 0,4,5 | Phase 4 COMPLETED | MEDIUM | READY |
+| 3 | Patient identity, profile, account, change password | 0,2 | Phase 1+2 COMPLETED | MEDIUM | COMPLETED |
+| 4 | Home dashboard & latest screening | 0,2,3 | Phase 2+4 COMPLETED | MEDIUM-HIGH | COMPLETED |
+| 5 | Screening history | 0,4 | Phase 4 COMPLETED | MEDIUM | COMPLETED |
+| 6 | Screening detail | 0,4,5 | Phase 4 COMPLETED | MEDIUM | COMPLETED |
 | 7 | Notification center | 0,4 | Phase 5 COMPLETED | MEDIUM | COMPLETED |
 | 8 | Firebase push integration | 0,2,7 | Phase 7 FINALIZED (FID) | HIGH | COMPLETED |
-| 9 | Education, nutrition, FAQ | 0,7 | Phase 8 COMPLETED | MEDIUM | READY — BACKEND CONTRACT AVAILABLE |
-| 10 | Settings, help, privacy, account completion | 0,3 | Phase 1 COMPLETED | LOW-MEDIUM | READY |
-| 11 | Integration, error handling, UX hardening | 0–10 | Phases 1–5 COMPLETED | MEDIUM | READY |
-| 12 | Testing, security, performance, production | 0–11 | Phases 1–5 COMPLETED | HIGH | READY |
+| 9 | Education and general nutrition | 0,7 | Phase 8 COMPLETED | MEDIUM | **COMPLETED** |
+| 10 | Account, password, help, privacy, app information | 0,3 | Phase 1+8 COMPLETED | LOW-MEDIUM | **COMPLETED** |
+| 11 | Integration, error handling, UX hardening | 0–10 | Phases 1–5 COMPLETED | MEDIUM | COMPLETED |
+| 12 | Testing, security, performance, production | 0–11 | Phases 1–5 COMPLETED | HIGH | COMPLETED — SOURCE READY |
 
 **Status legend:** READY (backend contract verified & final), BLOCKED (no approved backend contract — must not implement), COMPLETED (planning artifact done). Execution order for Phase 8 is unchanged: implemented only after Phase 7 + mobile foundations, per the implementer re-verification guard in the Phase 8 document.**
 
