@@ -1,0 +1,82 @@
+---
+name: Bug Report
+about: File a bug report for the mobile app
+labels: ["bug", "mobile", "needs-investigation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        Before submitting a bug, please make sure:
+        - You have checked the [existing issues](https://github.com/jeejaktc/hepasense-mobile/issues) for similar bugs
+        - You have run `flutter test` locally and the tests pass
+        - You have verified the issue on the latest version of main/develop
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: 1. Do this 2. Then do this 3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: A clear description of what you expected to happen.
+      placeholder: Describe what should happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: A clear description of what is actually happening.
+      placeholder: Describe what is actually happening
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of HepaSense Mobile are you running?
+      placeholder: e.g., 1.0.0+1
+
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: What device are you testing on?
+      placeholder: e.g., Android Emulator, iOS Simulator
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant log output.
+      placeholder: Paste any error logs here
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
+      placeholder: e.g., related issues, links, etc.

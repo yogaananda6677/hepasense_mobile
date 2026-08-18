@@ -6,7 +6,7 @@ class AppConfig {
   final AppEnvironment environment;
   final String apiBaseUrl;
 
-  static const String _defaultDevelopmentUrl = 'http://10.0.2.2:8000';
+  static const String _defaultDevelopmentUrl = 'http://192.168.1.10:8081';
 
   factory AppConfig.fromDefines({String? appEnv, String? apiBaseUrl}) {
     final env = _parseEnvironment(appEnv);

@@ -1,0 +1,50 @@
+---
+name: Feature Request
+about: Request a new feature or enhancement for the mobile app
+labels: ["feature", "mobile", "needs-discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a feature!
+
+        Before submitting a feature request, please:
+        - Check the [roadmap](https://github.com/jeejaktc/hepasense-mobile/discussions/categories/roadmap) for existing plans
+        - Check the [existing feature requests](https://github.com/jeejaktc/hepasense-mobile/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Afeature)
+        - Ensure the feature isn't already implemented
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the feature you are requesting.
+      placeholder: Tell us what you'd like to see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Explain the use case and why this feature is needed.
+      placeholder: Describe the problem this solves
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe how you envision this feature being implemented.
+      placeholder: Describe your implementation approach
+
+  - type: input
+    id: priority
+    attributes:
+      label: Priority
+      description: How critical is this feature?
+      options:
+        - "Must have"
+        - "Should have"
+        - "Could have"
+      value: "Should have"

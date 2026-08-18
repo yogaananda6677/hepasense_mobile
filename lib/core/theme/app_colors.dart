@@ -50,6 +50,12 @@ class AppColors {
   static const Color navigationBackground = Color(0xFFF5FBFA);
   static const Color navigationActive = Color(0xFFCFE9E5);
 
+  // Custom Stitch Gradient & Metric Tokens
+  static const Color heroGradientStart = Color(0xFF00695C);
+  static const Color heroGradientEnd = Color(0xFF26A69A);
+  static const Color metricCardBg = Color(0xFFF0F7F6);
+  static const Color metricBorder = Color(0xFFD9E5E4);
+
   // Status colors (not sole communicator — always pair with text/icon)
   static const Color statusHealthySurface = Color(0xFFE8F5E9);
   static const Color statusHealthy = Color(0xFF2E7D32);
@@ -60,3 +66,4 @@ class AppColors {
   static const Color statusInvalidSurface = Color(0xFFEEF2F4);
   static const Color statusInvalid = Color(0xFF5E6A71);
 }
+

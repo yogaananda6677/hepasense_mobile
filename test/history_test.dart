@@ -408,6 +408,8 @@ void main() {
       expect(find.text('Hasil Skrining Baik'), findsOneWidget);
       expect(find.text('Waspada'), findsWidgets);
       expect(find.text('Risiko Tinggi'), findsWidgets);
+      await tester.drag(find.byType(ListView).last, const Offset(0, -300));
+      await tester.pumpAndSettle();
       expect(find.text('Pemeriksaan Tidak Valid'), findsOneWidget);
       expect(find.textContaining('%'), findsNothing);
       expect(find.textContaining('diagnosis'), findsNothing);

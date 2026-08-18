@@ -29,4 +29,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/logo_hepasense.png
     - assets/images/health_tips_banner.png
+    - assets/images/login_screen.png
+    - assets/images/nutrition_hero.png
+    - assets/images/article_protein.png
+    - assets/images/article_lemon.png
+    - assets/images/article_spices.png
+    - assets/images/article_hydration.png

@@ -402,6 +402,8 @@ void main() {
       );
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       await tester.pump();
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -150));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Memahami skrining HepaSense'));
       await tester.pumpAndSettle();
       expect(find.text('DETAIL memahami-skrining'), findsOneWidget);

@@ -25,7 +25,7 @@ void main() {
 
     test('only development has an intentional default URL', () {
       final devConfig = AppConfig.fromDefines(appEnv: 'development');
-      expect(devConfig.apiBaseUrl, contains('10.0.2.2'));
+      expect(devConfig.apiBaseUrl, contains('8081'));
 
       final stagingConfig = AppConfig.fromDefines(appEnv: 'staging');
       expect(stagingConfig.apiBaseUrl, isEmpty);
